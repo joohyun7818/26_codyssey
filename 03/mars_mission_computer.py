@@ -21,6 +21,22 @@ class DummySensor:
         value = min_value + (max_value - min_value) * self._next_random()
         return round(value, digits)
 
+    def _current_timestamp(self):
+        # import 문 없이 내장 __import__로 time 모듈을 동적 로딩
+        time_module = __import__('time')
+        now = time_module.localtime(time_module.time())
+        return (
+            '{0:04d}-{1:02d}-{2:02d} '
+            '{3:02d}:{4:02d}:{5:02d}'.format(
+                now.tm_year,
+                now.tm_mon,
+                now.tm_mday,
+                now.tm_hour,
+                now.tm_min,
+                now.tm_sec,
+            )
+        )
+
     def set_env(self):
         self.env_values['mars_base_internal_temperature'] = self._rand_uniform(
             18, 30, 2
@@ -43,7 +59,7 @@ class DummySensor:
 
     def get_env(self):
         self._log_index += 1
-        current_time = 'TICK-{0:06d}'.format(self._log_index)
+        current_time = self._current_timestamp()
         log_values = [
             current_time,
             str(self.env_values['mars_base_internal_temperature']),
